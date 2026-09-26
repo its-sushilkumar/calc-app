@@ -2,41 +2,207 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>8-Bit Calculator</title>
+  <title>8-Bit Guessing Game</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
-    body {
-      background: #0f051d;
-      color: #f3e8ff;
+    :root {
+      --bg-color: #0f051d;
+      --screen-bg: #1b0e33;
+      --card-bg: #2a164d;
+      --text-main: #f3e8ff;
+      --text-muted: #a78bfa;
+      --yellow: #facc15;
+      --green: #4ade80;
+      --pink: #f472b6;
+      --cyan: #38bdf8;
+      --red: #f87171;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
       font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      margin: 0;
+      padding: 1rem;
     }
-    .calc-box {
-      border: 4px solid #facc15;
-      padding: 2rem;
-      background: #1b0e33;
+
+    .arcade-cabinet {
+      background: var(--screen-bg);
+      border: 4px solid var(--text-main);
       box-shadow: 6px 6px 0px #000;
+      padding: 2rem;
+      max-width: 450px;
+      width: 100%;
       text-align: center;
     }
-    a {
-      color: #38bdf8;
-      text-decoration: none;
+
+    h1 {
+      font-size: 0.9rem;
+      color: var(--yellow);
+      text-shadow: 2px 2px 0px #000;
+      margin-bottom: 1.5rem;
+      line-height: 1.4;
+    }
+
+    .screen {
+      background: #000;
+      border: 3px solid var(--cyan);
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+      min-height: 90px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .msg {
       font-size: 0.6rem;
-      margin-top: 1.5rem;
+      color: var(--green);
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+    }
+
+    .stats {
+      font-size: 0.5rem;
+      color: var(--text-muted);
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    input[type="number"] {
+      background: var(--card-bg);
+      border: 3px solid var(--text-main);
+      color: var(--yellow);
+      font-size: 0.8rem;
+      padding: 10px;
+      text-align: center;
+      width: 100%;
+      outline: none;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .btn {
+      background: var(--green);
+      color: #000;
+      font-size: 0.6rem;
+      font-weight: bold;
+      padding: 10px;
+      border: 3px solid #000;
+      box-shadow: 3px 3px 0px #000;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #000;
+    }
+
+    .back-link {
       display: inline-block;
+      color: var(--pink);
+      text-decoration: none;
+      font-size: 0.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <div class="calc-box">
-    <h2>[ CALCULATOR ]</h2>
-    <p style="font-size: 0.7rem; color: #a78bfa; margin-top: 1rem;">Work In Progress...</p>
-    <a href="https://home-page-two-flax.vercel.app/">◀ RETURN TO MAIN HUB</a>
+
+  <div class="arcade-cabinet">
+    <h1>[ GUESS THE NUMBER ]</h1>
+    
+    <div class="screen">
+      <div id="game-msg" class="msg">SYSTEM READY.<br>GUESS A NUMBER FROM 1 TO 50</div>
+      <div id="game-stats" class="stats">ATTEMPTS LEFT: 5</div>
+    </div>
+
+    <div class="controls" id="input-area">
+      <input type="number" id="user-guess" min="1" max="50" placeholder="??">
+      <button class="btn" onclick="checkGuess()">SUBMIT GUESS ▶</button>
+    </div>
+
+    <a href="https://home-page-sushil.vercel.app" class="back-link">◀ RETURN TO ARCADE HUB</a>
   </div>
+
+  <script>
+    let secretNumber = Math.floor(Math.random() * 50) + 1;
+    let attemptsLeft = 5;
+
+    function checkGuess() {
+      const inputEl = document.getElementById('user-guess');
+      const msgEl = document.getElementById('game-msg');
+      const statsEl = document.getElementById('game-stats');
+      const guess = parseInt(inputEl.value);
+
+      if (isNaN(guess) || guess < 1 || guess > 50) {
+        msgEl.style.color = 'var(--red)';
+        msgEl.innerHTML = "ERROR: ENTER 1 TO 50!";
+        return;
+      }
+
+      attemptsLeft--;
+
+      if (guess === secretNumber) {
+        msgEl.style.color = 'var(--green)';
+        msgEl.innerHTML = `VICTORY! SECRET WAS ${secret secretNumber}.`;
+        statsEl.innerHTML = "PRESS F5 TO REPLAY";
+        lockGame();
+      } else if (attemptsLeft === 0) {
+        msgEl.style.color = 'var(--red)';
+        msgEl.innerHTML = `GAME OVER! SECRET WAS ${secretNumber}.`;
+        statsEl.innerHTML = "OUT OF ATTEMPTS";
+        lockGame();
+      } else if (guess < secretNumber) {
+        msgEl.style.color = 'var(--yellow)';
+        msgEl.innerHTML = `TOO LOW! GO HIGHER.`;
+        statsEl.innerHTML = `ATTEMPTS LEFT: ${attemptsLeft}`;
+      } else {
+        msgEl.style.color = 'var(--yellow)';
+        msgEl.innerHTML = `TOO HIGH! GO LOWER.`;
+        statsEl.innerHTML = `ATTEMPTS LEFT: ${attemptsLeft}`;
+      }
+
+      inputEl.value = '';
+      inputEl.focus();
+    }
+
+    function lockGame() {
+      document.getElementById('input-area').style.display = 'none';
+    }
+
+    // Allow pressing 'Enter' to submit guess
+    document.getElementById('user-guess').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        checkGuess();
+      }
+    });
+  </script>
+
 </body>
 </html>
