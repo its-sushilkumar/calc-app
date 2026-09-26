@@ -2,20 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>8-Bit Guessing Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Utility Calculator</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-color: #0f051d;
-      --screen-bg: #1b0e33;
+      --panel-bg: #1b0e33;
       --card-bg: #2a164d;
       --text-main: #f3e8ff;
       --text-muted: #a78bfa;
-      --yellow: #facc15;
-      --green: #4ade80;
-      --pink: #f472b6;
-      --cyan: #38bdf8;
-      --red: #f87171;
+      --accent: #38bdf8;
+      --btn-hover: #4c1d95;
+      --danger: #f87171;
     }
 
     * {
@@ -23,7 +22,6 @@
       margin: 0;
       padding: 0;
       font-family: 'Press Start 2P', monospace;
-      image-rendering: pixelated;
     }
 
     body {
@@ -37,171 +35,173 @@
       padding: 1rem;
     }
 
-    .arcade-cabinet {
-      background: var(--screen-bg);
+    .calculator-container {
+      background: var(--panel-bg);
       border: 4px solid var(--text-main);
       box-shadow: 6px 6px 0px #000;
-      padding: 2rem;
-      max-width: 450px;
+      padding: 1.5rem;
+      max-width: 340px;
       width: 100%;
-      text-align: center;
     }
 
-    h1 {
-      font-size: 0.9rem;
-      color: var(--yellow);
-      text-shadow: 2px 2px 0px #000;
-      margin-bottom: 1.5rem;
-      line-height: 1.4;
-    }
-
-    .screen {
-      background: #000;
-      border: 3px solid var(--cyan);
-      padding: 1.2rem;
-      margin-bottom: 1.5rem;
-      min-height: 90px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .msg {
+    .calc-header {
       font-size: 0.6rem;
-      color: var(--green);
-      line-height: 1.6;
-      margin-bottom: 0.5rem;
-    }
-
-    .stats {
-      font-size: 0.5rem;
       color: var(--text-muted);
-    }
-
-    .controls {
+      margin-bottom: 1rem;
       display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      justify-content: space-between;
     }
 
-    input[type="number"] {
+    .display {
+      background: #000;
+      border: 3px solid var(--accent);
+      color: var(--accent);
+      font-size: 1rem;
+      padding: 1rem;
+      text-align: right;
+      margin-bottom: 1.2rem;
+      word-break: break-all;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .buttons-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    button {
       background: var(--card-bg);
-      border: 3px solid var(--text-main);
-      color: var(--yellow);
-      font-size: 0.8rem;
-      padding: 10px;
-      text-align: center;
-      width: 100%;
-      outline: none;
-    }
-
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-
-    .btn {
-      background: var(--green);
-      color: #000;
-      font-size: 0.6rem;
-      font-weight: bold;
-      padding: 10px;
-      border: 3px solid #000;
-      box-shadow: 3px 3px 0px #000;
+      color: var(--text-main);
+      border: 2px solid var(--text-main);
+      padding: 14px 0;
+      font-size: 0.7rem;
       cursor: pointer;
-      text-transform: uppercase;
+      box-shadow: 2px 2px 0px #000;
+      transition: background 0.1s;
     }
 
-    .btn:active {
-      transform: translate(2px, 2px);
+    button:hover {
+      background: var(--btn-hover);
+    }
+
+    button:active {
+      transform: translate(1px, 1px);
       box-shadow: 1px 1px 0px #000;
+    }
+
+    .btn-operator {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .btn-clear {
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    .btn-equals {
+      background: var(--accent);
+      color: #000;
+      grid-column: span 2;
     }
 
     .back-link {
       display: inline-block;
-      color: var(--pink);
+      color: var(--text-muted);
       text-decoration: none;
       font-size: 0.5rem;
       margin-top: 1.5rem;
+      text-align: center;
+      width: 100%;
     }
 
     .back-link:hover {
-      text-decoration: underline;
+      color: var(--text-main);
     }
   </style>
 </head>
 <body>
 
-  <div class="arcade-cabinet">
-    <h1>[ GUESS THE NUMBER ]</h1>
-    
-    <div class="screen">
-      <div id="game-msg" class="msg">SYSTEM READY.<br>GUESS A NUMBER FROM 1 TO 50</div>
-      <div id="game-stats" class="stats">ATTEMPTS LEFT: 5</div>
+  <div class="calculator-container">
+    <div class="calc-header">
+      <span>CALC v1.0</span>
+      <span>STANDARD</span>
     </div>
 
-    <div class="controls" id="input-area">
-      <input type="number" id="user-guess" min="1" max="50" placeholder="??">
-      <button class="btn" onclick="checkGuess()">SUBMIT GUESS ▶</button>
+    <div id="display" class="display">0</div>
+
+    <div class="buttons-grid">
+      <button class="btn-clear" onclick="clearDisplay()">C</button>
+      <button onclick="appendValue('/')" class="btn-operator">/</button>
+      <button onclick="appendValue('*')" class="btn-operator">*</button>
+      <button onclick="deleteChar()">⌫</button>
+
+      <button onclick="appendValue('7')">7</button>
+      <button onclick="appendValue('8')">8</button>
+      <button onclick="appendValue('9')">9</button>
+      <button onclick="appendValue('-')" class="btn-operator">-</button>
+
+      <button onclick="appendValue('4')">4</button>
+      <button onclick="appendValue('5')">5</button>
+      <button onclick="appendValue('6')">6</button>
+      <button onclick="appendValue('+')" class="btn-operator">+</button>
+
+      <button onclick="appendValue('1')">1</button>
+      <button onclick="appendValue('2')">2</button>
+      <button onclick="appendValue('3')">3</button>
+      <button onclick="calculate()" class="btn-equals" style="grid-row: span 2; height: 100%;">=</button>
+
+      <button onclick="appendValue('0')" style="grid-column: span 2;">0</button>
+      <button onclick="appendValue('.')">.</button>
     </div>
 
-    <a href="https://home-page-sushil.vercel.app" class="back-link">◀ RETURN TO ARCADE HUB</a>
+    <a href="https://home-page-sushil.vercel.app" class="back-link">◀ RETURN TO PORTFOLIO</a>
   </div>
 
   <script>
-    let secretNumber = Math.floor(Math.random() * 50) + 1;
-    let attemptsLeft = 5;
+    const display = document.getElementById('display');
+    let currentInput = '0';
 
-    function checkGuess() {
-      const inputEl = document.getElementById('user-guess');
-      const msgEl = document.getElementById('game-msg');
-      const statsEl = document.getElementById('game-stats');
-      const guess = parseInt(inputEl.value);
+    function updateDisplay() {
+      display.innerText = currentInput;
+    }
 
-      if (isNaN(guess) || guess < 1 || guess > 50) {
-        msgEl.style.color = 'var(--red)';
-        msgEl.innerHTML = "ERROR: ENTER 1 TO 50!";
-        return;
-      }
-
-      attemptsLeft--;
-
-      if (guess === secretNumber) {
-        msgEl.style.color = 'var(--green)';
-        msgEl.innerHTML = `VICTORY! SECRET WAS ${secret secretNumber}.`;
-        statsEl.innerHTML = "PRESS F5 TO REPLAY";
-        lockGame();
-      } else if (attemptsLeft === 0) {
-        msgEl.style.color = 'var(--red)';
-        msgEl.innerHTML = `GAME OVER! SECRET WAS ${secretNumber}.`;
-        statsEl.innerHTML = "OUT OF ATTEMPTS";
-        lockGame();
-      } else if (guess < secretNumber) {
-        msgEl.style.color = 'var(--yellow)';
-        msgEl.innerHTML = `TOO LOW! GO HIGHER.`;
-        statsEl.innerHTML = `ATTEMPTS LEFT: ${attemptsLeft}`;
+    function appendValue(val) {
+      if (currentInput === '0' && val !== '.') {
+        currentInput = val;
       } else {
-        msgEl.style.color = 'var(--yellow)';
-        msgEl.innerHTML = `TOO HIGH! GO LOWER.`;
-        statsEl.innerHTML = `ATTEMPTS LEFT: ${attemptsLeft}`;
+        currentInput += val;
       }
-
-      inputEl.value = '';
-      inputEl.focus();
+      updateDisplay();
     }
 
-    function lockGame() {
-      document.getElementById('input-area').style.display = 'none';
+    function clearDisplay() {
+      currentInput = '0';
+      updateDisplay();
     }
 
-    // Allow pressing 'Enter' to submit guess
-    document.getElementById('user-guess').addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        checkGuess();
+    function deleteChar() {
+      if (currentInput.length > 1) {
+        currentInput = currentInput.slice(0, -1);
+      } else {
+        currentInput = '0';
       }
-    });
+      updateDisplay();
+    }
+
+    function calculate() {
+      try {
+        // Safe evaluation for standard utility math
+        currentInput = String(eval(currentInput));
+      } catch (error) {
+        currentInput = 'ERROR';
+      }
+      updateDisplay();
+    }
   </script>
 
 </body>
